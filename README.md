@@ -57,7 +57,7 @@ Your hands rest by your sides and rise when you use them, then lower again after
 
 ## Joining worlds and changing avatars
 
-In Desktop VR, join worlds and switch avatars from outside the game: on the [VRChat website](https://vrchat.com/home) or with [VRCX](https://github.com/vrcx-team/VRCX).
+In Desktop VR, join worlds and switch avatars from outside the game: on the [VRChat website](https://vrchat.com/home) or with [VRCX](https://github.com/vrcx-team/VRCX). Same with just opening general menus, open it via third party, since I haven't been arsed to make it possible.
 
 ## Settings
 
