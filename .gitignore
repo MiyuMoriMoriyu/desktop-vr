@@ -1,0 +1,6 @@
+/tools/
+/build/
+/dist/
+/Desktop VR.exe
+/driver/desktopvr/bin/
+*.bak-*

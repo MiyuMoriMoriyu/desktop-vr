@@ -1,0 +1,16 @@
+{
+	"driver_desktopvr": {
+		"enable": true,
+		"window_width": 480,
+		"window_height": 270,
+		"render_width": 1920,
+		"render_height": 1080,
+		"fov_vertical": 70.0,
+		"mouse_sensitivity": 0.1,
+		"hand_speed": 0.0008,
+		"standing_height": 1.65,
+		"crouch_height": 1.1,
+		"prone_height": 0.35,
+		"aim_pitch": 40.0
+	}
+}
