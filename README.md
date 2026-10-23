@@ -9,8 +9,11 @@ It never touches VRChat or Easy Anti-Cheat. It works the same way as other Steam
 ## Requirements
 
 - Windows 10 or 11 (64-bit)
-- Steam, with **SteamVR** installed
+- Steam, with **SteamVR** installed and started at least once
 - **VRChat** from Steam
+- A PC that runs VRChat well: VR mode draws the world twice (once per eye), so expect lower FPS than desktop mode
+
+No headset, admin rights or extra installs are needed.
 
 ## Install
 
@@ -32,7 +35,7 @@ Controls only work while the VRChat window is focused.
 |---|---|
 | Mouse | Look around |
 | Hold **Q** / **E** + mouse | Move left / right hand |
-| Mouse wheel | Move the hand closer / further |
+| Mouse wheel | Move the right hand closer / further. Left hand while Q is held |
 | **R** | Reset hands |
 | Left click | Trigger (use, click menus). Left hand while Q is held |
 | Right click | Grip (grab). Left hand while Q is held |
@@ -62,7 +65,7 @@ Edit `driver\desktopvr\resources\settings\default.vrsettings` while SteamVR is c
 
 | Setting | Default | What it does |
 |---|---|---|
-| `render_width` / `render_height` | 1920 / 1080 | Resolution VRChat renders at |
+| `render_width` / `render_height` | 1920 / 1080 | Resolution VRChat renders each eye at. Lower it for more FPS |
 | `fov_vertical` | 70 | Vertical field of view in degrees |
 | `mouse_sensitivity` | 0.1 | Look speed |
 | `hand_speed` | 0.0008 | Hand movement speed |
@@ -90,4 +93,4 @@ This builds `Desktop VR.exe` and `driver\desktopvr\bin\win64\driver_desktopvr.dl
 
 ## License
 
-MIT. Includes the OpenVR driver header and code adapted from Valve's OpenVR hand skeleton sample, both BSD-3-Clause (see `third_party\openvr\LICENSE`).
+MIT. Includes the OpenVR driver header and code adapted from Valve's OpenVR hand skeleton sample, both BSD-3-Clause (see `third_party\openvr\LICENSE`, or `LICENSE-OpenVR.txt` in the download).
