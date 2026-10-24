@@ -33,6 +33,7 @@ private:
     double idle_[2] = { 1e9, 1e9 };
     double readiness_[2] = { 0.0, 0.0 };
     Vec3 offsets_[2];
+    Quat twists_[2];
     Pose head_;
     Pose hands_[2];
 };

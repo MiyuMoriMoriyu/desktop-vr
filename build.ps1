@@ -6,11 +6,12 @@ if (-not (Test-Path $msvc)) { throw 'MSVC not found: put a portable MSVC in tool
 New-Item -ItemType Directory -Force $obj, (Join-Path $root 'driver\desktopvr\bin\win64') | Out-Null
 
 $flags = '/nologo /std:c++17 /O2 /EHsc /MT /W4 /DWIN32_LEAN_AND_MEAN /DNOMINMAX /DUNICODE /D_UNICODE'
+$sources = (Get-ChildItem "$root\src\*.cpp" | Where-Object Name -notlike '*_linux.cpp' | ForEach-Object { "`"$($_.FullName)`"" }) -join ' '
 $script = Join-Path $obj 'build.bat'
 @"
 @echo off
 call "$msvc" || exit /b 1
-cl $flags /LD /external:W0 /external:I "$root\third_party\openvr" /Fo"$obj/" "$root\src\*.cpp" /Fe"$root\driver\desktopvr\bin\win64\driver_desktopvr.dll" /link user32.lib || exit /b 1
+cl $flags /LD /external:W0 /external:I "$root\third_party\openvr" /Fo"$obj/" $sources /Fe"$root\driver\desktopvr\bin\win64\driver_desktopvr.dll" /link user32.lib || exit /b 1
 rc /nologo /fo "$obj\launcher.res" "$root\launcher\launcher.rc" || exit /b 1
 cl $flags /Fo"$obj/" "$root\launcher\launcher.cpp" "$obj\launcher.res" /Fe"$root\Desktop VR.exe" /link /SUBSYSTEM:WINDOWS user32.lib shell32.lib advapi32.lib || exit /b 1
 "@ | Set-Content -Encoding ascii $script

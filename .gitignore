@@ -2,5 +2,6 @@
 /build/
 /dist/
 /Desktop VR.exe
+/desktop-vr
 /driver/desktopvr/bin/
 *.bak-*

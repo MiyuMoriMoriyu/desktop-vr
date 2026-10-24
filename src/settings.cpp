@@ -27,6 +27,7 @@ Settings LoadSettings()
     settings.fovVertical = Float("fov_vertical");
     settings.sensitivity = Float("mouse_sensitivity");
     settings.handSpeed = Float("hand_speed");
+    settings.rotateSpeed = Float("rotate_speed");
     settings.standingHeight = Float("standing_height");
     settings.crouchHeight = Float("crouch_height");
     settings.proneHeight = Float("prone_height");

@@ -1,5 +1,3 @@
-#include <windows.h>
-
 #include <atomic>
 #include <chrono>
 #include <cstring>
@@ -10,29 +8,19 @@
 #include "hmd.h"
 #include "input.h"
 #include "openvr_driver.h"
+#include "platform.h"
 #include "rig.h"
 #include "settings.h"
 
 namespace
 {
-bool SessionActive()
-{
-    HANDLE session = OpenMutexW(SYNCHRONIZE, FALSE, L"Local\\DesktopVRSession");
-    if (!session)
-    {
-        return false;
-    }
-    CloseHandle(session);
-    return true;
-}
-
 class Provider final : public vr::IServerTrackedDeviceProvider
 {
 public:
     vr::EVRInitError Init(vr::IVRDriverContext* context) override
     {
         VR_INIT_SERVER_DRIVER_CONTEXT(context);
-        if (!SessionActive())
+        if (!platform::StartSession())
         {
             return vr::VRInitError_Init_HmdNotFound;
         }
@@ -109,7 +97,13 @@ private:
 Provider g_provider;
 }
 
-extern "C" __declspec(dllexport) void* HmdDriverFactory(const char* interfaceName, int* returnCode)
+#if defined(_WIN32)
+#define DESKTOPVR_EXPORT extern "C" __declspec(dllexport)
+#else
+#define DESKTOPVR_EXPORT extern "C" __attribute__((visibility("default")))
+#endif
+
+DESKTOPVR_EXPORT void* HmdDriverFactory(const char* interfaceName, int* returnCode)
 {
     if (std::strcmp(interfaceName, vr::IServerTrackedDeviceProvider_Version) == 0)
     {

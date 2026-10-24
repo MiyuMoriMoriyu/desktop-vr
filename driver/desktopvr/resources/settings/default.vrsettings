@@ -8,6 +8,7 @@
 		"fov_vertical": 70.0,
 		"mouse_sensitivity": 0.1,
 		"hand_speed": 0.0008,
+		"rotate_speed": 0.25,
 		"standing_height": 1.65,
 		"crouch_height": 1.1,
 		"prone_height": 0.35,

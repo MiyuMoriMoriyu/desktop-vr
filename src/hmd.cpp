@@ -1,23 +1,9 @@
 #include "hmd.h"
 
-#include <windows.h>
-
 #include <cmath>
 #include <cstring>
 
-namespace
-{
-float RefreshRate()
-{
-    DEVMODEW mode{};
-    mode.dmSize = sizeof(mode);
-    if (EnumDisplaySettingsW(nullptr, ENUM_CURRENT_SETTINGS, &mode) && mode.dmDisplayFrequency > 1)
-    {
-        return static_cast<float>(mode.dmDisplayFrequency);
-    }
-    return 60.f;
-}
-}
+#include "platform.h"
 
 Hmd::Hmd(const Settings& settings)
     : settings_(settings)
@@ -33,7 +19,7 @@ vr::EVRInitError Hmd::Activate(uint32_t objectId)
     vr::VRProperties()->SetStringProperty(container, vr::Prop_TrackingSystemName_String, "desktopvr");
     vr::VRProperties()->SetFloatProperty(container, vr::Prop_UserIpdMeters_Float, 0.f);
     vr::VRProperties()->SetFloatProperty(container, vr::Prop_UserHeadToEyeDepthMeters_Float, 0.f);
-    vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayFrequency_Float, RefreshRate());
+    vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayFrequency_Float, platform::RefreshRate());
     vr::VRProperties()->SetFloatProperty(container, vr::Prop_SecondsFromVsyncToPhotons_Float, 0.01f);
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_IsOnDesktop_Bool, false);
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplayDebugMode_Bool, true);
@@ -90,10 +76,7 @@ void Hmd::Publish(const Pose& head)
 
 void Hmd::GetWindowBounds(int32_t* x, int32_t* y, uint32_t* width, uint32_t* height)
 {
-    RECT workArea{};
-    SystemParametersInfoW(SPI_GETWORKAREA, 0, &workArea, 0);
-    *x = workArea.right - settings_.windowWidth;
-    *y = workArea.bottom - settings_.windowHeight;
+    platform::WindowPosition(settings_.windowWidth, settings_.windowHeight, x, y);
     *width = settings_.windowWidth;
     *height = settings_.windowHeight;
 }

@@ -9,6 +9,7 @@ struct Settings
     double fovVertical = 0.0;
     double sensitivity = 0.0;
     double handSpeed = 0.0;
+    double rotateSpeed = 0.0;
     double standingHeight = 0.0;
     double crouchHeight = 0.0;
     double proneHeight = 0.0;

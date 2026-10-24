@@ -20,6 +20,7 @@ struct InputFrame
     double lookY = 0.0;
     double wheel = 0.0;
     int movingHand = -1;
+    int rotatingHand = -1;
     bool crouch = false;
     bool prone = false;
     bool resetHands = false;

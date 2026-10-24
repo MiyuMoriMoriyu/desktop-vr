@@ -7,10 +7,11 @@ namespace
 constexpr double kFocusDistance = 1.5;
 constexpr double kWheelStep = 0.04;
 constexpr double kRaiseHold = 5.0;
+constexpr double kRollStep = 15.0;
 const Vec3 kUp{ 0.0, 1.0, 0.0 };
 const Vec3 kRight{ 1.0, 0.0, 0.0 };
 const Vec3 kForward{ 0.0, 0.0, -1.0 };
-const Vec3 kRestDirection = Normalize({ 0.0, -1.0, -0.18 });
+const Vec3 kRestDirection = Normalize(Vec3{ 0.0, -1.0, -0.18 });
 const Vec3 kDefaultOffsets[2] = { { -0.18, -0.28, -0.35 }, { 0.18, -0.28, -0.35 } };
 const Vec3 kRestOffsets[2] = { { -0.2, -0.7, 0.02 }, { 0.2, -0.7, 0.02 } };
 
@@ -52,6 +53,8 @@ void Rig::ResetHands()
 {
     offsets_[0] = kDefaultOffsets[0];
     offsets_[1] = kDefaultOffsets[1];
+    twists_[0] = { 1.0, 0.0, 0.0, 0.0 };
+    twists_[1] = { 1.0, 0.0, 0.0, 0.0 };
 }
 
 void Rig::Update(const InputFrame& input, double dt)
@@ -62,21 +65,21 @@ void Rig::Update(const InputFrame& input, double dt)
         ResetHands();
     }
 
-    if (input.movingHand < 0)
+    if (input.rotatingHand < 0 && input.movingHand < 0)
     {
         const double step = Rad(settings_.sensitivity);
         yaw_ -= input.lookX * step;
         pitch_ = std::clamp(pitch_ - input.lookY * step, Rad(-85.0), Rad(85.0));
     }
-    else
+    else if (input.rotatingHand < 0)
     {
         Vec3& offset = offsets_[input.movingHand];
         offset.x = std::clamp(offset.x + input.lookX * settings_.handSpeed, -0.7, 0.7);
         offset.y = std::clamp(offset.y - input.lookY * settings_.handSpeed, -0.8, 0.4);
     }
 
-    const int wheelHand = input.movingHand == 0 ? 0 : 1;
-    if (input.wheel != 0.0)
+    const int wheelHand = input.rotatingHand >= 0 ? input.rotatingHand : (input.movingHand == 0 ? 0 : 1);
+    if (input.wheel != 0.0 && input.rotatingHand < 0)
     {
         Vec3& offset = offsets_[wheelHand];
         offset.z = std::clamp(offset.z - input.wheel * kWheelStep, -0.75, -0.1);
@@ -92,6 +95,8 @@ void Rig::Update(const InputFrame& input, double dt)
 
     const Quat body = AxisAngle(kUp, bodyYaw_);
     const Vec3 up = Rotate(head_.rotation, kUp);
+    const Vec3 right = Rotate(head_.rotation, kRight);
+    const Vec3 forward = Rotate(head_.rotation, kForward);
     const Vec3 focus = head_.position + Rotate(head_.rotation, { 0.0, 0.0, -kFocusDistance });
     const Quat aim = AxisAngle(kRight, Rad(settings_.aimPitch));
     const Quat restRotation = LookRotation(Rotate(body, kRestDirection), Rotate(body, kForward)) * aim;
@@ -100,14 +105,22 @@ void Rig::Update(const InputFrame& input, double dt)
     {
         const HandInput& handInput = input.hands[hand];
         const bool used = handInput.trigger || handInput.grip || input.hands[0].b || input.movingHand == hand ||
-            (input.wheel != 0.0 && wheelHand == hand);
+            input.rotatingHand == hand || (input.wheel != 0.0 && wheelHand == hand);
         idle_[hand] = used ? 0.0 : idle_[hand] + dt;
         const double raise = idle_[hand] < kRaiseHold ? 1.0 : 0.0;
         readiness_[hand] = Approach(readiness_[hand], raise, raise > readiness_[hand] ? 10.0 : 3.0, dt);
         const double blend = SmoothStep(std::clamp(readiness_[hand], 0.0, 1.0));
 
         const Vec3 readyPosition = head_.position + Rotate(head_.rotation, offsets_[hand]);
-        const Quat readyRotation = LookRotation(focus - readyPosition, up) * aim;
+        const Quat base = LookRotation(focus - readyPosition, up);
+        if (input.rotatingHand == hand)
+        {
+            const double step = Rad(settings_.rotateSpeed);
+            const Quat turn = AxisAngle(up, -input.lookX * step) * AxisAngle(right, -input.lookY * step) *
+                AxisAngle(forward, Rad(input.wheel * kRollStep));
+            twists_[hand] = Normalize(Conjugate(base) * turn * base * twists_[hand]);
+        }
+        const Quat readyRotation = base * twists_[hand] * aim;
 
         const double phase = time_ * 0.9 + hand * 1.7;
         const Vec3 sway{ std::sin(phase) * 0.008, 0.0, std::cos(phase * 0.8) * 0.01 };

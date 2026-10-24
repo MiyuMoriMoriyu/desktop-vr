@@ -67,6 +67,12 @@ inline Quat AxisAngle(const Vec3& axis, double angle)
     return { std::cos(angle * 0.5), axis.x * s, axis.y * s, axis.z * s };
 }
 
+inline Quat Normalize(const Quat& q)
+{
+    const double length = std::sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
+    return { q.w / length, q.x / length, q.y / length, q.z / length };
+}
+
 inline Quat Slerp(const Quat& a, Quat b, double t)
 {
     double cosine = a.w * b.w + a.x * b.x + a.y * b.y + a.z * b.z;
@@ -84,9 +90,7 @@ inline Quat Slerp(const Quat& a, Quat b, double t)
         wa = std::sin((1.0 - t) * angle) / sine;
         wb = std::sin(t * angle) / sine;
     }
-    const Quat q{ a.w * wa + b.w * wb, a.x * wa + b.x * wb, a.y * wa + b.y * wb, a.z * wa + b.z * wb };
-    const double length = std::sqrt(q.w * q.w + q.x * q.x + q.y * q.y + q.z * q.z);
-    return { q.w / length, q.x / length, q.y / length, q.z / length };
+    return Normalize(Quat{ a.w * wa + b.w * wb, a.x * wa + b.x * wb, a.y * wa + b.y * wb, a.z * wa + b.z * wb });
 }
 
 inline Quat LookRotation(const Vec3& forward, const Vec3& upHint)
