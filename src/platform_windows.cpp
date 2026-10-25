@@ -31,3 +31,8 @@ void platform::WindowPosition(uint32_t width, uint32_t height, int32_t* x, int32
     *x = workArea.right - static_cast<int32_t>(width);
     *y = workArea.bottom - static_cast<int32_t>(height);
 }
+
+vr::IVRDriverDirectModeComponent* platform::DirectMode()
+{
+    return nullptr;
+}

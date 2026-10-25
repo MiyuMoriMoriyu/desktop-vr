@@ -22,7 +22,13 @@ vr::EVRInitError Hmd::Activate(uint32_t objectId)
     vr::VRProperties()->SetFloatProperty(container, vr::Prop_DisplayFrequency_Float, platform::RefreshRate());
     vr::VRProperties()->SetFloatProperty(container, vr::Prop_SecondsFromVsyncToPhotons_Float, 0.01f);
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_IsOnDesktop_Bool, false);
-    vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplayDebugMode_Bool, true);
+    const bool directMode = platform::DirectMode() != nullptr;
+    vr::VRProperties()->SetBoolProperty(container, vr::Prop_DisplayDebugMode_Bool, !directMode);
+    if (directMode)
+    {
+        vr::VRProperties()->SetBoolProperty(container, vr::Prop_HasDriverDirectModeComponent_Bool, true);
+        vr::VRProperties()->SetBoolProperty(container, vr::Prop_DriverDirectModeSendsVsyncEvents_Bool, true);
+    }
     vr::VRProperties()->SetBoolProperty(container, vr::Prop_ContainsProximitySensor_Bool, true);
 
     vr::VRInputComponentHandle_t proximity;
@@ -42,6 +48,10 @@ void* Hmd::GetComponent(const char* componentNameAndVersion)
     if (std::strcmp(componentNameAndVersion, vr::IVRDisplayComponent_Version) == 0)
     {
         return static_cast<vr::IVRDisplayComponent*>(this);
+    }
+    if (std::strcmp(componentNameAndVersion, vr::IVRDriverDirectModeComponent_Version) == 0)
+    {
+        return platform::DirectMode();
     }
     return nullptr;
 }
@@ -72,6 +82,11 @@ void Hmd::Publish(const Pose& head)
     {
         vr::VRServerDriverHost()->TrackedDevicePoseUpdated(objectId, pose, sizeof(pose));
     }
+}
+
+bool Hmd::IsDisplayOnDesktop()
+{
+    return platform::DirectMode() == nullptr;
 }
 
 void Hmd::GetWindowBounds(int32_t* x, int32_t* y, uint32_t* width, uint32_t* height)

@@ -20,7 +20,7 @@ public:
     vr::DriverPose_t GetPose() override;
 
     void GetWindowBounds(int32_t* x, int32_t* y, uint32_t* width, uint32_t* height) override;
-    bool IsDisplayOnDesktop() override { return true; }
+    bool IsDisplayOnDesktop() override;
     bool IsDisplayRealDisplay() override { return false; }
     void GetRecommendedRenderTargetSize(uint32_t* width, uint32_t* height) override;
     void GetEyeOutputViewport(vr::EVREye eye, uint32_t* x, uint32_t* y, uint32_t* width, uint32_t* height) override;

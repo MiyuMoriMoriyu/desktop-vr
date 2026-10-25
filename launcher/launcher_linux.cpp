@@ -298,9 +298,8 @@ void CloseVRChat()
     Signal({ "VRChat.exe" }, SIGKILL);
 }
 
-bool LaunchVRChat()
+bool OpenSteam(const char* url)
 {
-    const char url[] = "steam://launch/438100/VR";
     return Spawn({ "steam", url }) > 0 || Spawn({ "xdg-open", url }) > 0;
 }
 
@@ -662,13 +661,14 @@ int Play(int server)
     Capture capture(window, session);
     Stage stage = Stage::StartingSteamVR;
     bool gameStarted = false;
-    bool running = Spawn({ runtime + "/bin/vrstartup.sh" }) > 0;
+    bool running = OpenSteam("steam://rungameid/250820");
     if (!running)
     {
         Warn(window, "SteamVR could not be started.");
     }
-    auto deadline = Clock::now() + std::chrono::seconds(60);
+    auto deadline = Clock::now() + std::chrono::seconds(120);
     auto nextCheck = Clock::now();
+    auto steamVRSeen = Clock::now();
     bool dirty = true;
     bool shownCapture = false;
 
@@ -701,11 +701,15 @@ int Play(int server)
             nextCheck = now + std::chrono::seconds(1);
             const bool steamVR = IsRunning("vrserver");
             const bool game = IsRunning("VRChat.exe");
+            if (steamVR)
+            {
+                steamVRSeen = now;
+            }
             if (stage == Stage::StartingSteamVR)
             {
                 if (steamVR)
                 {
-                    LaunchVRChat();
+                    OpenSteam("steam://launch/438100/VR");
                     stage = Stage::StartingGame;
                     deadline = now + std::chrono::seconds(180);
                     dirty = true;
@@ -718,7 +722,7 @@ int Play(int server)
             }
             else if (!steamVR)
             {
-                running = false;
+                running = now - steamVRSeen < std::chrono::seconds(15);
             }
             else if (game && !gameStarted)
             {

@@ -100,6 +100,7 @@ Edit `driver/desktopvr/resources/settings/default.vrsettings` while SteamVR is c
 - On Linux, Desktop VR never reads your keyboard or mouse system-wide: it only gets input while its own window is focused, and needs no special permissions.
 - Use at your own risk. Desktop VR does not modify VRChat, but VRChat's rules are VRChat's call.
 - Only VRChat on Steam is supported.
+- If SteamVR crashes, it can start in safe mode and turn off add-ons, Desktop VR included. Turn them back on in SteamVR's settings under Startup / Shutdown > Manage Add-ons, then start Desktop VR again.
 - Linux support is new. If something doesn't work, open an issue and attach `~/.local/share/Steam/logs/vrserver.txt`.
 
 ## Build from source
@@ -113,7 +114,7 @@ This builds `Desktop VR.exe` and `driver\desktopvr\bin\win64\driver_desktopvr.dl
 
 **Linux**
 
-Run `./build.sh` with g++, CMake, curl and the usual SDL build dependencies installed. It downloads and checks SDL 3, then builds `desktop-vr` and `driver/desktopvr/bin/linux64/driver_desktopvr.so`. Release builds use Valve's Steam Runtime SDK, so they run on older distros too:
+Run `./build.sh` with g++, CMake, curl and the usual SDL build dependencies installed (on Fedora also `libstdc++-static`). It downloads and checks SDL 3, then builds `desktop-vr` and `driver/desktopvr/bin/linux64/driver_desktopvr.so`. Release builds use Valve's Steam Runtime SDK, so they run on older distros too:
 
 ```
 podman run --rm -v "$PWD":/src -w /src registry.gitlab.steamos.cloud/steamrt/sniper/sdk ./build.sh
